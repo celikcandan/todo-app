@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo Uygulaması</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 16px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 480px;
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      padding: 28px 24px;
+      color: white;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .header p {
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    .input-area {
+      padding: 20px 24px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      gap: 10px;
+    }
+
+    .input-area input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-area input:focus {
+      border-color: #667eea;
+    }
+
+    .input-area button {
+      padding: 10px 18px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 20px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .input-area button:hover {
+      background: #5a6fd6;
+    }
+
+    .filters {
+      display: flex;
+      padding: 12px 24px;
+      gap: 8px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .filters button {
+      padding: 6px 14px;
+      border: 2px solid #e2e8f0;
+      border-radius: 20px;
+      background: transparent;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #555;
+    }
+
+    .filters button.active {
+      background: #667eea;
+      border-color: #667eea;
+      color: white;
+    }
+
+    .todo-list {
+      list-style: none;
+      min-height: 60px;
+    }
+
+    .todo-item {
+      display: flex;
+      align-items: center;
+      padding: 14px 24px;
+      border-bottom: 1px solid #f5f5f5;
+      gap: 12px;
+      transition: background 0.15s;
+    }
+
+    .todo-item:hover {
+      background: #fafafa;
+    }
+
+    .todo-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #667eea;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .todo-item span {
+      flex: 1;
+      font-size: 15px;
+      color: #333;
+      transition: all 0.2s;
+    }
+
+    .todo-item.done span {
+      text-decoration: line-through;
+      color: #aaa;
+    }
+
+    .todo-item .delete-btn {
+      background: none;
+      border: none;
+      color: #ccc;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: color 0.2s;
+    }
+
+    .todo-item .delete-btn:hover {
+      color: #e53e3e;
+    }
+
+    .empty {
+      text-align: center;
+      color: #bbb;
+      padding: 40px 24px;
+      font-size: 15px;
+    }
+
+    .footer {
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: #888;
+      border-top: 1px solid #eee;
+    }
+
+    .footer button {
+      background: none;
+      border: none;
+      color: #e53e3e;
+      cursor: pointer;
+      font-size: 13px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .footer button:hover {
+      background: #fff5f5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Yapılacaklar</h1>
+      <p id="date"></p>
+    </div>
+
+    <div class="input-area">
+      <input type="text" id="todo-input" placeholder="Yeni görev ekle..." maxlength="100">
+      <button id="add-btn" title="Ekle">+</button>
+    </div>
+
+    <div class="filters">
+      <button class="active" data-filter="all">Tümü</button>
+      <button data-filter="active">Bekleyen</button>
+      <button data-filter="done">Tamamlanan</button>
+    </div>
+
+    <ul class="todo-list" id="todo-list"></ul>
+
+    <div class="footer">
+      <span id="count"></span>
+      <button id="clear-btn">Tamamlananları sil</button>
+    </div>
+  </div>
+
+  <script>
+    let todos = JSON.parse(localStorage.getItem('todos') || '[]');
+    let filter = 'all';
+
+    const input = document.getElementById('todo-input');
+    const list = document.getElementById('todo-list');
+    const countEl = document.getElementById('count');
+    const dateEl = document.getElementById('date');
+
+    dateEl.textContent = new Date().toLocaleDateString('tr-TR', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+
+    function save() {
+      localStorage.setItem('todos', JSON.stringify(todos));
+    }
+
+    function render() {
+      const filtered = todos.filter(t =>
+        filter === 'all' ? true : filter === 'done' ? t.done : !t.done
+      );
+
+      list.innerHTML = '';
+
+      if (filtered.length === 0) {
+        list.innerHTML = '<li class="empty">Görev yok</li>';
+      } else {
+        filtered.forEach(todo => {
+          const li = document.createElement('li');
+          li.className = 'todo-item' + (todo.done ? ' done' : '');
+          li.innerHTML = `
+            <input type="checkbox" ${todo.done ? 'checked' : ''} data-id="${todo.id}">
+            <span>${todo.text}</span>
+            <button class="delete-btn" data-id="${todo.id}" title="Sil">&#10005;</button>
+          `;
+          list.appendChild(li);
+        });
+      }
+
+      const remaining = todos.filter(t => !t.done).length;
+      countEl.textContent = `${remaining} görev bekliyor`;
+    }
+
+    function addTodo() {
+      const text = input.value.trim();
+      if (!text) return;
+      todos.unshift({ id: Date.now(), text, done: false });
+      input.value = '';
+      save();
+      render();
+    }
+
+    document.getElementById('add-btn').addEventListener('click', addTodo);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') addTodo(); });
+
+    list.addEventListener('change', e => {
+      if (e.target.type === 'checkbox') {
+        const id = Number(e.target.dataset.id);
+        const todo = todos.find(t => t.id === id);
+        if (todo) { todo.done = e.target.checked; save(); render(); }
+      }
+    });
+
+    list.addEventListener('click', e => {
+      if (e.target.classList.contains('delete-btn')) {
+        const id = Number(e.target.dataset.id);
+        todos = todos.filter(t => t.id !== id);
+        save();
+        render();
+      }
+    });
+
+    document.querySelectorAll('.filters button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filters button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        filter = btn.dataset.filter;
+        render();
+      });
+    });
+
+    document.getElementById('clear-btn').addEventListener('click', () => {
+      todos = todos.filter(t => !t.done);
+      save();
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
