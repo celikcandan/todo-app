@@ -5,11 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Todo Uygulaması</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -36,16 +32,141 @@
       color: white;
     }
 
-    .header h1 {
-      font-size: 24px;
-      font-weight: 700;
-      margin-bottom: 4px;
+    .header h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+    .header p { font-size: 14px; opacity: 0.8; }
+
+    /* AUTH SCREENS */
+    .auth-screen {
+      padding: 32px 24px;
     }
 
-    .header p {
-      font-size: 14px;
-      opacity: 0.8;
+    .auth-screen h2 {
+      font-size: 20px;
+      color: #333;
+      margin-bottom: 6px;
     }
+
+    .auth-screen .subtitle {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 6px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus { border-color: #667eea; }
+
+    .btn-primary {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      margin-top: 8px;
+    }
+
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .auth-switch {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #888;
+    }
+
+    .auth-switch a {
+      color: #667eea;
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .auth-switch a:hover { text-decoration: underline; }
+
+    .notice {
+      background: #ebf4ff;
+      border: 1px solid #bee3f8;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      color: #2b6cb0;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .notice strong { display: block; margin-bottom: 4px; font-size: 16px; }
+
+    .error-msg {
+      background: #fff5f5;
+      border: 1px solid #fed7d7;
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #c53030;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+
+    .success-msg {
+      background: #f0fff4;
+      border: 1px solid #c6f6d5;
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #276749;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+
+    /* TODO APP */
+    .todo-app { display: none; }
+
+    .top-bar {
+      padding: 12px 24px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .top-bar span { font-weight: 500; }
+
+    .top-bar button {
+      background: none;
+      border: none;
+      color: #667eea;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .top-bar button:hover { text-decoration: underline; }
 
     .input-area {
       padding: 20px 24px;
@@ -64,9 +185,7 @@
       transition: border-color 0.2s;
     }
 
-    .input-area input:focus {
-      border-color: #667eea;
-    }
+    .input-area input:focus { border-color: #667eea; }
 
     .input-area button {
       padding: 10px 18px;
@@ -79,14 +198,8 @@
       transition: background 0.2s;
     }
 
-    .input-area button:hover {
-      background: #5a6fd6;
-    }
-
-    .input-area button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
+    .input-area button:hover { background: #5a6fd6; }
+    .input-area button:disabled { opacity: 0.6; cursor: not-allowed; }
 
     .filters {
       display: flex;
@@ -112,10 +225,7 @@
       color: white;
     }
 
-    .todo-list {
-      list-style: none;
-      min-height: 60px;
-    }
+    .todo-list { list-style: none; min-height: 60px; }
 
     .todo-item {
       display: flex;
@@ -126,13 +236,10 @@
       transition: background 0.15s;
     }
 
-    .todo-item:hover {
-      background: #fafafa;
-    }
+    .todo-item:hover { background: #fafafa; }
 
     .todo-item input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
+      width: 18px; height: 18px;
       accent-color: #667eea;
       cursor: pointer;
       flex-shrink: 0;
@@ -142,7 +249,6 @@
       flex: 1;
       font-size: 15px;
       color: #333;
-      transition: all 0.2s;
     }
 
     .todo-item.done span {
@@ -161,28 +267,21 @@
       transition: color 0.2s;
     }
 
-    .todo-item .delete-btn:hover {
-      color: #e53e3e;
-    }
+    .todo-item .delete-btn:hover { color: #e53e3e; }
 
-    .empty {
+    .empty, .loading {
       text-align: center;
       color: #bbb;
       padding: 40px 24px;
       font-size: 15px;
     }
 
-    .loading {
-      text-align: center;
-      color: #667eea;
-      padding: 40px 24px;
-      font-size: 15px;
-    }
+    .loading { color: #667eea; }
 
-    .error-msg {
+    .inline-error {
       text-align: center;
       color: #e53e3e;
-      padding: 12px 24px;
+      padding: 10px 24px;
       font-size: 13px;
       background: #fff5f5;
     }
@@ -208,173 +307,361 @@
       transition: background 0.2s;
     }
 
-    .footer button:hover {
-      background: #fff5f5;
-    }
+    .footer button:hover { background: #fff5f5; }
+
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
       <h1>Yapılacaklar</h1>
-      <p id="date"></p>
+      <p id="header-sub">Hesabınıza giriş yapın</p>
     </div>
 
-    <div class="input-area">
-      <input type="text" id="todo-input" placeholder="Yeni görev ekle..." maxlength="100">
-      <button id="add-btn" title="Ekle">+</button>
+    <!-- LOGIN -->
+    <div id="screen-login" class="auth-screen">
+      <h2>Giriş Yap</h2>
+      <p class="subtitle">Hesabınıza erişin</p>
+      <div id="login-error" class="error-msg hidden"></div>
+      <div class="form-group">
+        <label>E-posta</label>
+        <input type="email" id="login-email" placeholder="ornek@mail.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Şifre</label>
+        <input type="password" id="login-password" placeholder="Şifreniz" autocomplete="current-password">
+      </div>
+      <button class="btn-primary" id="login-btn">Giriş Yap</button>
+      <div class="auth-switch">
+        Hesabınız yok mu? <a id="go-register">Kayıt Ol</a>
+      </div>
     </div>
 
-    <div class="filters">
-      <button class="active" data-filter="all">Tümü</button>
-      <button data-filter="active">Bekleyen</button>
-      <button data-filter="done">Tamamlanan</button>
+    <!-- REGISTER -->
+    <div id="screen-register" class="auth-screen hidden">
+      <h2>Kayıt Ol</h2>
+      <p class="subtitle">Yeni hesap oluşturun</p>
+      <div id="register-error" class="error-msg hidden"></div>
+      <div class="form-group">
+        <label>E-posta</label>
+        <input type="email" id="reg-email" placeholder="ornek@mail.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Şifre</label>
+        <input type="password" id="reg-password" placeholder="En az 6 karakter" autocomplete="new-password">
+      </div>
+      <button class="btn-primary" id="register-btn">Kayıt Ol</button>
+      <div class="auth-switch">
+        Zaten hesabınız var mı? <a id="go-login">Giriş Yap</a>
+      </div>
     </div>
 
-    <ul class="todo-list" id="todo-list"></ul>
+    <!-- EMAIL CONFIRMATION NOTICE -->
+    <div id="screen-confirm" class="auth-screen hidden">
+      <div class="notice">
+        <strong>📧 E-postanızı Onaylayın</strong>
+        Kayıt başarılı! <strong id="confirm-email"></strong> adresine bir onay bağlantısı gönderdik.
+        <br><br>
+        Bağlantıya tıkladıktan sonra giriş yapabilirsiniz.
+      </div>
+      <div class="auth-switch" style="margin-top:20px;">
+        <a id="back-to-login">← Giriş sayfasına dön</a>
+      </div>
+    </div>
 
-    <div class="footer">
-      <span id="count"></span>
-      <button id="clear-btn">Tamamlananları sil</button>
+    <!-- TODO APP -->
+    <div id="todo-app" class="todo-app">
+      <div class="top-bar">
+        <span id="user-email-display"></span>
+        <button id="logout-btn">Çıkış Yap</button>
+      </div>
+      <div class="input-area">
+        <input type="text" id="todo-input" placeholder="Yeni görev ekle..." maxlength="100">
+        <button id="add-btn" title="Ekle">+</button>
+      </div>
+      <div class="filters">
+        <button class="active" data-filter="all">Tümü</button>
+        <button data-filter="active">Bekleyen</button>
+        <button data-filter="done">Tamamlanan</button>
+      </div>
+      <ul class="todo-list" id="todo-list"></ul>
+      <div class="footer">
+        <span id="count"></span>
+        <button id="clear-btn">Tamamlananları sil</button>
+      </div>
     </div>
   </div>
 
   <script>
     const SUPABASE_URL = 'https://wkxkfjyrdojtzqcvhrcp.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndreGtmanlyZG9qdHpxY3ZocmNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MDkxNDQsImV4cCI6MjA5MjI4NTE0NH0.y2iiCbL3vDhuUbXX8HTeNMYcO4DDVI4lkS9w5B0MW4Y';
+    const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndreGtmanlyZG9qdHpxY3ZocmNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MDkxNDQsImV4cCI6MjA5MjI4NTE0NH0.y2iiCbL3vDhuUbXX8HTeNMYcO4DDVI4lkS9w5B0MW4Y';
 
-    const headers = {
-      'Content-Type': 'application/json',
-      'apikey': SUPABASE_ANON_KEY,
-      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-      'Prefer': 'return=representation'
-    };
-
-    async function api(path, options = {}) {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1${path}`, {
-        ...options,
-        headers: { ...headers, ...options.headers }
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.message || 'İstek başarısız');
-      }
-      const text = await res.text();
-      return text ? JSON.parse(text) : null;
-    }
-
+    let accessToken = null;
+    let currentUser = null;
     let todos = [];
     let filter = 'all';
 
-    const input = document.getElementById('todo-input');
-    const list = document.getElementById('todo-list');
-    const countEl = document.getElementById('count');
-    const addBtn = document.getElementById('add-btn');
-
-    document.getElementById('date').textContent = new Date().toLocaleDateString('tr-TR', {
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-    });
-
-    function showError(msg) {
-      const existing = document.querySelector('.error-msg');
-      if (existing) existing.remove();
-      const div = document.createElement('div');
-      div.className = 'error-msg';
-      div.textContent = msg;
-      list.before(div);
-      setTimeout(() => div.remove(), 4000);
+    // ── helpers ──────────────────────────────────────────────
+    function authHeaders() {
+      return {
+        'Content-Type': 'application/json',
+        'apikey': ANON_KEY,
+        'Authorization': `Bearer ${accessToken || ANON_KEY}`
+      };
     }
 
-    function render() {
+    async function authApi(path, options = {}) {
+      const res = await fetch(`${SUPABASE_URL}/auth/v1${path}`, {
+        ...options,
+        headers: { 'Content-Type': 'application/json', 'apikey': ANON_KEY, ...options.headers }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error_description || data.msg || data.message || 'Hata oluştu');
+      return data;
+    }
+
+    async function dbApi(path, options = {}) {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1${path}`, {
+        ...options,
+        headers: { ...authHeaders(), 'Prefer': 'return=representation', ...options.headers }
+      });
+      if (res.status === 204) return null;
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Veritabanı hatası');
+      return data;
+    }
+
+    function saveSession(session) {
+      if (session) {
+        localStorage.setItem('sb_access_token', session.access_token);
+        localStorage.setItem('sb_refresh_token', session.refresh_token);
+        localStorage.setItem('sb_user_email', session.user?.email || '');
+        accessToken = session.access_token;
+        currentUser = session.user;
+      } else {
+        localStorage.removeItem('sb_access_token');
+        localStorage.removeItem('sb_refresh_token');
+        localStorage.removeItem('sb_user_email');
+        accessToken = null;
+        currentUser = null;
+      }
+    }
+
+    // ── screens ──────────────────────────────────────────────
+    function showScreen(id) {
+      ['screen-login','screen-register','screen-confirm','todo-app'].forEach(s => {
+        const el = document.getElementById(s);
+        el.classList.add('hidden');
+        if (s === 'todo-app') el.style.display = 'none';
+      });
+      const target = document.getElementById(id);
+      target.classList.remove('hidden');
+      if (id === 'todo-app') target.style.display = 'block';
+    }
+
+    function showError(containerId, msg) {
+      const el = document.getElementById(containerId);
+      el.textContent = msg;
+      el.classList.remove('hidden');
+    }
+
+    function hideError(containerId) {
+      document.getElementById(containerId).classList.add('hidden');
+    }
+
+    // ── auth ─────────────────────────────────────────────────
+    document.getElementById('go-register').addEventListener('click', () => {
+      hideError('login-error');
+      showScreen('screen-register');
+    });
+
+    document.getElementById('go-login').addEventListener('click', () => {
+      hideError('register-error');
+      showScreen('screen-login');
+    });
+
+    document.getElementById('back-to-login').addEventListener('click', () => {
+      showScreen('screen-login');
+    });
+
+    document.getElementById('login-btn').addEventListener('click', async () => {
+      hideError('login-error');
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      if (!email || !password) return showError('login-error', 'E-posta ve şifre gereklidir.');
+      const btn = document.getElementById('login-btn');
+      btn.disabled = true; btn.textContent = 'Giriş yapılıyor...';
+      try {
+        const data = await authApi('/token?grant_type=password', {
+          method: 'POST',
+          body: JSON.stringify({ email, password })
+        });
+        saveSession(data);
+        await initApp();
+      } catch (e) {
+        showError('login-error', e.message === 'Invalid login credentials'
+          ? 'E-posta veya şifre hatalı.' : e.message);
+      } finally {
+        btn.disabled = false; btn.textContent = 'Giriş Yap';
+      }
+    });
+
+    document.getElementById('register-btn').addEventListener('click', async () => {
+      hideError('register-error');
+      const email = document.getElementById('reg-email').value.trim();
+      const password = document.getElementById('reg-password').value;
+      if (!email || !password) return showError('register-error', 'Tüm alanları doldurun.');
+      if (password.length < 6) return showError('register-error', 'Şifre en az 6 karakter olmalı.');
+      const btn = document.getElementById('register-btn');
+      btn.disabled = true; btn.textContent = 'Kayıt olunuyor...';
+      try {
+        await authApi('/signup', {
+          method: 'POST',
+          body: JSON.stringify({
+            email, password,
+            options: { emailRedirectTo: 'https://celikcandan.github.io/todo-app/' }
+          })
+        });
+        document.getElementById('confirm-email').textContent = email;
+        showScreen('screen-confirm');
+      } catch (e) {
+        showError('register-error', e.message);
+      } finally {
+        btn.disabled = false; btn.textContent = 'Kayıt Ol';
+      }
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      try { await authApi('/logout', { method: 'POST', headers: { 'Authorization': `Bearer ${accessToken}` } }); } catch {}
+      saveSession(null);
+      showScreen('screen-login');
+      document.getElementById('header-sub').textContent = 'Hesabınıza giriş yapın';
+    });
+
+    // enter key on inputs
+    ['login-email','login-password'].forEach(id => {
+      document.getElementById(id).addEventListener('keydown', e => {
+        if (e.key === 'Enter') document.getElementById('login-btn').click();
+      });
+    });
+    ['reg-email','reg-password'].forEach(id => {
+      document.getElementById(id).addEventListener('keydown', e => {
+        if (e.key === 'Enter') document.getElementById('register-btn').click();
+      });
+    });
+
+    // ── todo app ─────────────────────────────────────────────
+    async function initApp() {
+      document.getElementById('user-email-display').textContent = currentUser?.email || '';
+      document.getElementById('header-sub').textContent = new Date().toLocaleDateString('tr-TR', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      });
+      showScreen('todo-app');
+      await loadTodos();
+    }
+
+    function renderTodos() {
+      const list = document.getElementById('todo-list');
       const filtered = todos.filter(t =>
         filter === 'all' ? true : filter === 'done' ? t.done : !t.done
       );
-
       list.innerHTML = '';
-
       if (filtered.length === 0) {
         list.innerHTML = '<li class="empty">Görev yok</li>';
       } else {
         filtered.forEach(todo => {
           const li = document.createElement('li');
           li.className = 'todo-item' + (todo.done ? ' done' : '');
-          const safeText = todo.text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          const safe = todo.text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
           li.innerHTML = `
             <input type="checkbox" ${todo.done ? 'checked' : ''} data-id="${todo.id}">
-            <span>${safeText}</span>
+            <span>${safe}</span>
             <button class="delete-btn" data-id="${todo.id}" title="Sil">&#10005;</button>
           `;
           list.appendChild(li);
         });
       }
-
       const remaining = todos.filter(t => !t.done).length;
-      countEl.textContent = `${remaining} görev bekliyor`;
+      document.getElementById('count').textContent = `${remaining} görev bekliyor`;
+    }
+
+    function showInlineError(msg) {
+      const existing = document.querySelector('.inline-error');
+      if (existing) existing.remove();
+      const div = document.createElement('div');
+      div.className = 'inline-error';
+      div.textContent = msg;
+      document.getElementById('todo-list').before(div);
+      setTimeout(() => div.remove(), 4000);
     }
 
     async function loadTodos() {
+      const list = document.getElementById('todo-list');
       list.innerHTML = '<li class="loading">Yükleniyor...</li>';
       try {
-        todos = await api('/todos?order=created_at.desc');
-        render();
+        todos = await dbApi('/todos?order=created_at.desc');
+        renderTodos();
       } catch (e) {
-        showError('Veriler yüklenemedi: ' + e.message);
+        showInlineError('Yüklenemedi: ' + e.message);
         list.innerHTML = '<li class="empty">Görev yok</li>';
       }
     }
 
+    document.getElementById('add-btn').addEventListener('click', addTodo);
+    document.getElementById('todo-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') addTodo();
+    });
+
     async function addTodo() {
+      const input = document.getElementById('todo-input');
       const text = input.value.trim();
       if (!text) return;
-      addBtn.disabled = true;
+      const btn = document.getElementById('add-btn');
+      btn.disabled = true;
       try {
-        const [created] = await api('/todos', {
+        const [created] = await dbApi('/todos', {
           method: 'POST',
-          body: JSON.stringify({ text, done: false })
+          body: JSON.stringify({ text, done: false, user_id: currentUser.id })
         });
         todos.unshift(created);
         input.value = '';
-        render();
+        renderTodos();
       } catch (e) {
-        showError('Görev eklenemedi: ' + e.message);
+        showInlineError('Eklenemedi: ' + e.message);
       } finally {
-        addBtn.disabled = false;
+        btn.disabled = false;
       }
     }
 
-    addBtn.addEventListener('click', addTodo);
-    input.addEventListener('keydown', e => { if (e.key === 'Enter') addTodo(); });
-
-    list.addEventListener('change', async e => {
-      if (e.target.type === 'checkbox') {
-        const id = Number(e.target.dataset.id);
-        const todo = todos.find(t => t.id === id);
-        if (!todo) return;
-        const newDone = e.target.checked;
-        try {
-          await api(`/todos?id=eq.${id}`, {
-            method: 'PATCH',
-            body: JSON.stringify({ done: newDone })
-          });
-          todo.done = newDone;
-          render();
-        } catch (e) {
-          showError('Güncellenemedi: ' + e.message);
-          e.target.checked = todo.done;
-        }
+    document.getElementById('todo-list').addEventListener('change', async e => {
+      if (e.target.type !== 'checkbox') return;
+      const id = Number(e.target.dataset.id);
+      const todo = todos.find(t => t.id === id);
+      if (!todo) return;
+      const newDone = e.target.checked;
+      try {
+        await dbApi(`/todos?id=eq.${id}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ done: newDone })
+        });
+        todo.done = newDone;
+        renderTodos();
+      } catch (e) {
+        showInlineError('Güncellenemedi: ' + e.message);
+        e.target.checked = todo.done;
       }
     });
 
-    list.addEventListener('click', async e => {
-      if (e.target.classList.contains('delete-btn')) {
-        const id = Number(e.target.dataset.id);
-        try {
-          await api(`/todos?id=eq.${id}`, { method: 'DELETE' });
-          todos = todos.filter(t => t.id !== id);
-          render();
-        } catch (err) {
-          showError('Silinemedi: ' + err.message);
-        }
+    document.getElementById('todo-list').addEventListener('click', async e => {
+      if (!e.target.classList.contains('delete-btn')) return;
+      const id = Number(e.target.dataset.id);
+      try {
+        await dbApi(`/todos?id=eq.${id}`, { method: 'DELETE' });
+        todos = todos.filter(t => t.id !== id);
+        renderTodos();
+      } catch (e) {
+        showInlineError('Silinemedi: ' + e.message);
       }
     });
 
@@ -383,23 +670,102 @@
         document.querySelectorAll('.filters button').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         filter = btn.dataset.filter;
-        render();
+        renderTodos();
       });
     });
 
     document.getElementById('clear-btn').addEventListener('click', async () => {
-      const doneIds = todos.filter(t => t.done).map(t => t.id);
-      if (doneIds.length === 0) return;
+      if (!todos.some(t => t.done)) return;
       try {
-        await api(`/todos?done=eq.true`, { method: 'DELETE' });
+        await dbApi('/todos?done=eq.true', { method: 'DELETE' });
         todos = todos.filter(t => !t.done);
-        render();
+        renderTodos();
       } catch (e) {
-        showError('Silinemedi: ' + e.message);
+        showInlineError('Silinemedi: ' + e.message);
       }
     });
 
-    loadTodos();
+    // ── startup: handle email confirmation callback ───────────
+    async function handleHashTokens() {
+      const hash = window.location.hash.substring(1);
+      if (!hash) return false;
+      const params = new URLSearchParams(hash);
+      const type = params.get('type');
+      const token = params.get('access_token');
+      const refresh = params.get('refresh_token');
+      if (!token) return false;
+
+      // Clean the URL
+      history.replaceState(null, '', window.location.pathname);
+
+      if (type === 'signup' || type === 'magiclink' || type === 'recovery') {
+        // Exchange tokens for user info
+        try {
+          const userData = await authApi('/user', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          saveSession({
+            access_token: token,
+            refresh_token: refresh,
+            user: userData
+          });
+          return true;
+        } catch { return false; }
+      }
+      return false;
+    }
+
+    async function refreshSession(refreshToken) {
+      try {
+        const data = await authApi('/token?grant_type=refresh_token', {
+          method: 'POST',
+          body: JSON.stringify({ refresh_token: refreshToken })
+        });
+        saveSession(data);
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    async function boot() {
+      // 1. Check email confirmation callback in URL hash
+      const fromHash = await handleHashTokens();
+      if (fromHash) {
+        await initApp();
+        return;
+      }
+
+      // 2. Try restoring session from localStorage
+      const storedToken = localStorage.getItem('sb_access_token');
+      const storedRefresh = localStorage.getItem('sb_refresh_token');
+      const storedEmail = localStorage.getItem('sb_user_email');
+
+      if (storedToken && storedRefresh) {
+        accessToken = storedToken;
+        try {
+          // Verify token is still valid
+          const userData = await authApi('/user', {
+            headers: { 'Authorization': `Bearer ${storedToken}` }
+          });
+          currentUser = userData;
+          await initApp();
+          return;
+        } catch {
+          // Token expired, try refresh
+          const refreshed = await refreshSession(storedRefresh);
+          if (refreshed) {
+            await initApp();
+            return;
+          }
+        }
+      }
+
+      // 3. Show login screen
+      showScreen('screen-login');
+    }
+
+    boot();
   </script>
 </body>
 </html>
