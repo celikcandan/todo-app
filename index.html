@@ -310,6 +310,33 @@
     .footer button:hover { background: #fff5f5; }
 
     .hidden { display: none !important; }
+
+    /* GARDEN */
+    .garden-wrap {
+      background: linear-gradient(180deg, #e0f2fe 0%, #fef9c3 100%);
+      padding: 0;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #garden-canvas {
+      display: block;
+      width: 100%;
+      max-width: 480px;
+      height: 160px;
+    }
+
+    .garden-caption {
+      font-size: 13px;
+      color: #6b7280;
+      padding: 6px 0 10px;
+      font-style: italic;
+      text-align: center;
+      min-height: 28px;
+      transition: opacity 0.4s;
+    }
   </style>
 </head>
 <body>
@@ -375,6 +402,10 @@
       <div class="top-bar">
         <span id="user-email-display"></span>
         <button id="logout-btn">Çıkış Yap</button>
+      </div>
+      <div class="garden-wrap">
+        <canvas id="garden-canvas" width="480" height="160"></canvas>
+        <div class="garden-caption" id="garden-caption">Tohumunuz toprağa ekildi 🌱</div>
       </div>
       <div class="input-area">
         <input type="text" id="todo-input" placeholder="Yeni görev ekle..." maxlength="100">
@@ -555,6 +586,8 @@
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
       });
       showScreen('todo-app');
+      gardenP = 0; gardenTarget = 0;
+      drawGarden(0);
       await loadTodos();
     }
 
@@ -599,6 +632,7 @@
       try {
         todos = await dbApi('/todos?order=created_at.desc');
         renderTodos();
+        updateGarden();
       } catch (e) {
         showInlineError('Yüklenemedi: ' + e.message);
         list.innerHTML = '<li class="empty">Görev yok</li>';
@@ -624,6 +658,7 @@
         todos.unshift(created);
         input.value = '';
         renderTodos();
+        updateGarden();
       } catch (e) {
         showInlineError('Eklenemedi: ' + e.message);
       } finally {
@@ -644,6 +679,7 @@
         });
         todo.done = newDone;
         renderTodos();
+        updateGarden();
       } catch (e) {
         showInlineError('Güncellenemedi: ' + e.message);
         e.target.checked = todo.done;
@@ -657,6 +693,7 @@
         await dbApi(`/todos?id=eq.${id}`, { method: 'DELETE' });
         todos = todos.filter(t => t.id !== id);
         renderTodos();
+        updateGarden();
       } catch (e) {
         showInlineError('Silinemedi: ' + e.message);
       }
@@ -677,10 +714,210 @@
         await dbApi('/todos?done=eq.true', { method: 'DELETE' });
         todos = todos.filter(t => !t.done);
         renderTodos();
+        updateGarden();
       } catch (e) {
         showInlineError('Silinemedi: ' + e.message);
       }
     });
+
+    // ── garden ───────────────────────────────────────────────
+    let gardenP = 0;
+    let gardenTarget = 0;
+    let gardenRaf = null;
+
+    function updateGarden() {
+      const done = todos.filter(t => t.done).length;
+      gardenTarget = Math.min(done / 8, 1);
+      const captions = [
+        { min: 0, text: 'Tohumunuz toprağa ekildi 🌱' },
+        { min: 1, text: 'Filiz veriyor... 🌿' },
+        { min: 3, text: 'Yapraklar açıyor 🍃' },
+        { min: 5, text: 'Tomurcuklanıyor...' },
+        { min: 7, text: 'Çiçek açmak üzere 🌺' },
+        { min: 8, text: 'Tam çiçek! Harika iş! 🌸' },
+      ];
+      const cap = [...captions].reverse().find(c => done >= c.min) || captions[0];
+      document.getElementById('garden-caption').textContent = cap.text;
+      if (!gardenRaf) gardenRaf = requestAnimationFrame(gardenLoop);
+    }
+
+    function gardenLoop() {
+      const diff = gardenTarget - gardenP;
+      gardenP += diff * 0.045;
+      drawGarden(gardenP);
+      if (Math.abs(diff) > 0.001) {
+        gardenRaf = requestAnimationFrame(gardenLoop);
+      } else {
+        gardenP = gardenTarget;
+        drawGarden(gardenP);
+        gardenRaf = null;
+      }
+    }
+
+    function ease(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
+    function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+    function prog(p, start, end) { return ease(clamp((p - start) / (end - start), 0, 1)); }
+
+    function drawGarden(p) {
+      const canvas = document.getElementById('garden-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width, H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+      const cx = W / 2;
+      const soilY = H * 0.76;
+
+      // Sky
+      const sky = ctx.createLinearGradient(0, 0, 0, soilY);
+      sky.addColorStop(0, '#bfdbfe'); sky.addColorStop(1, '#fef9c3');
+      ctx.fillStyle = sky; ctx.fillRect(0, 0, W, soilY);
+
+      // Clouds (subtle)
+      [{ x: W*0.2, y: H*0.15, r: 18 }, { x: W*0.75, y: H*0.1, r: 14 }].forEach(c => {
+        ctx.save(); ctx.globalAlpha = 0.35;
+        ctx.fillStyle = '#fff';
+        [-1,0,1].forEach(dx => {
+          ctx.beginPath(); ctx.arc(c.x + dx*c.r*0.7, c.y, c.r*(0.7+Math.abs(dx)*0.1), 0, Math.PI*2); ctx.fill();
+        });
+        ctx.restore();
+      });
+
+      // Soil body
+      const sg = ctx.createLinearGradient(0, soilY, 0, H);
+      sg.addColorStop(0, '#a16207'); sg.addColorStop(1, '#78350f');
+      ctx.fillStyle = sg; ctx.fillRect(0, soilY, W, H - soilY);
+
+      // Soil wavy top
+      ctx.beginPath(); ctx.moveTo(0, soilY);
+      for (let x = 0; x <= W; x += 6) ctx.lineTo(x, soilY + Math.sin(x * 0.38) * 2.5);
+      ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+      ctx.fillStyle = '#b45309'; ctx.fill();
+
+      // Grass tufts
+      [[cx-40,soilY],[cx+55,soilY],[cx-80,soilY],[cx+90,soilY]].forEach(([gx, gy]) => {
+        ctx.save(); ctx.strokeStyle = '#16a34a'; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
+        [-3,0,3].forEach(dx => {
+          ctx.beginPath(); ctx.moveTo(gx+dx, gy); ctx.lineTo(gx+dx+dx*0.3, gy-7); ctx.stroke();
+        });
+        ctx.restore();
+      });
+
+      const stemMaxH = H * 0.57;
+      const stemP = prog(p, 0.08, 1);
+      const stemH = stemP * stemMaxH;
+      const flowerY = soilY - stemH;
+
+      // Seed (fades as plant grows)
+      if (p < 0.2) {
+        const op = 1 - p / 0.2;
+        ctx.save(); ctx.globalAlpha = op;
+        ctx.translate(cx, soilY - 4); ctx.rotate(-0.25);
+        const sg2 = ctx.createRadialGradient(-2,-1,1,0,0,9);
+        sg2.addColorStop(0,'#92400e'); sg2.addColorStop(1,'#451a03');
+        ctx.beginPath(); ctx.ellipse(0,0,9,5.5,0,0,Math.PI*2);
+        ctx.fillStyle = sg2; ctx.fill();
+        ctx.beginPath(); ctx.moveTo(-6,0); ctx.quadraticCurveTo(0,-2,6,0);
+        ctx.strokeStyle='rgba(255,255,255,0.25)'; ctx.lineWidth=1; ctx.stroke();
+        ctx.restore();
+      }
+
+      // Stem
+      if (stemP > 0) {
+        ctx.save();
+        const sG = ctx.createLinearGradient(cx-2, soilY, cx+2, flowerY);
+        sG.addColorStop(0,'#15803d'); sG.addColorStop(1,'#4ade80');
+        ctx.strokeStyle = sG; ctx.lineWidth = 3.5; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(cx, soilY);
+        const cpx = cx + Math.sin(stemP * Math.PI) * 8;
+        ctx.quadraticCurveTo(cpx, soilY - stemH * 0.5, cx, flowerY);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Left leaf
+      if (p > 0.28) {
+        const lp = prog(p, 0.28, 0.55);
+        const ly = soilY - stemH * 0.44;
+        ctx.save(); ctx.globalAlpha = lp; ctx.translate(cx, ly);
+        const lg = ctx.createLinearGradient(0,0,-36*lp,0);
+        lg.addColorStop(0,'#16a34a'); lg.addColorStop(1,'#4ade80');
+        ctx.beginPath(); ctx.moveTo(0,0);
+        ctx.quadraticCurveTo(-22*lp,-14*lp,-36*lp,-4*lp);
+        ctx.quadraticCurveTo(-20*lp, 6*lp, 0, 0);
+        ctx.fillStyle=lg; ctx.fill();
+        ctx.beginPath(); ctx.moveTo(0,0); ctx.quadraticCurveTo(-18*lp,-6*lp,-34*lp,-3*lp);
+        ctx.strokeStyle='rgba(255,255,255,0.3)'; ctx.lineWidth=0.8; ctx.stroke();
+        ctx.restore();
+      }
+
+      // Right leaf
+      if (p > 0.46) {
+        const lp = prog(p, 0.46, 0.72);
+        const ly = soilY - stemH * 0.66;
+        ctx.save(); ctx.globalAlpha = lp; ctx.translate(cx, ly);
+        const lg = ctx.createLinearGradient(0,0,36*lp,0);
+        lg.addColorStop(0,'#15803d'); lg.addColorStop(1,'#86efac');
+        ctx.beginPath(); ctx.moveTo(0,0);
+        ctx.quadraticCurveTo(24*lp,-16*lp,38*lp,-5*lp);
+        ctx.quadraticCurveTo(22*lp, 7*lp, 0, 0);
+        ctx.fillStyle=lg; ctx.fill();
+        ctx.beginPath(); ctx.moveTo(0,0); ctx.quadraticCurveTo(20*lp,-6*lp,36*lp,-4*lp);
+        ctx.strokeStyle='rgba(255,255,255,0.3)'; ctx.lineWidth=0.8; ctx.stroke();
+        ctx.restore();
+      }
+
+      // Bud
+      if (p > 0.58 && p < 0.78) {
+        const bp = prog(p, 0.58, 0.78);
+        ctx.save(); ctx.translate(cx, flowerY);
+        for (let i = 0; i < 5; i++) {
+          ctx.save(); ctx.rotate((i/5)*Math.PI*2 - Math.PI/2);
+          ctx.beginPath(); ctx.ellipse(0,-bp*9, bp*4.5, bp*10, 0, 0, Math.PI*2);
+          ctx.fillStyle=`hsl(${280+i*10},55%,72%)`; ctx.fill(); ctx.restore();
+        }
+        ctx.beginPath(); ctx.arc(0,0,bp*5,0,Math.PI*2);
+        ctx.fillStyle='#bbf7d0'; ctx.fill(); ctx.restore();
+      }
+
+      // Petals
+      if (p > 0.72) {
+        const fp = prog(p, 0.72, 1);
+        const n = 8, pLen = fp*26, pW = fp*10;
+        ctx.save(); ctx.translate(cx, flowerY);
+        // Back petals
+        for (let i = 0; i < n; i++) {
+          ctx.save(); ctx.rotate((i/n)*Math.PI*2 + Math.PI/n);
+          ctx.globalAlpha = fp * 0.65;
+          ctx.beginPath(); ctx.ellipse(0,-pLen*0.6, pW*0.45, pLen*0.9, 0, 0, Math.PI*2);
+          ctx.fillStyle=`hsl(${295+i*6},55%,80%)`; ctx.fill(); ctx.restore();
+        }
+        // Front petals
+        for (let i = 0; i < n; i++) {
+          ctx.save(); ctx.rotate((i/n)*Math.PI*2);
+          ctx.globalAlpha = fp;
+          const pg = ctx.createLinearGradient(0,0,0,-pLen);
+          pg.addColorStop(0,`hsl(${265+i*8},65%,68%)`);
+          pg.addColorStop(1,`hsl(${310+i*5},72%,82%)`);
+          ctx.beginPath(); ctx.ellipse(0,-pLen*0.6, pW*0.5, pLen, 0, 0, Math.PI*2);
+          ctx.fillStyle=pg; ctx.fill(); ctx.restore();
+        }
+        // Center
+        const cr = fp*12;
+        const cg = ctx.createRadialGradient(0,0,0,0,0,cr);
+        cg.addColorStop(0,'#fde68a'); cg.addColorStop(0.55,'#fbbf24'); cg.addColorStop(1,'#d97706');
+        ctx.globalAlpha = fp;
+        ctx.beginPath(); ctx.arc(0,0,cr,0,Math.PI*2); ctx.fillStyle=cg; ctx.fill();
+        if (fp > 0.5) {
+          const dotOp = (fp-0.5)/0.5;
+          for (let i=0;i<7;i++){
+            const a=(i/7)*Math.PI*2, dr=cr*0.55;
+            ctx.beginPath(); ctx.arc(Math.cos(a)*dr,Math.sin(a)*dr,1.8,0,Math.PI*2);
+            ctx.fillStyle=`rgba(120,53,15,${dotOp*0.75})`; ctx.fill();
+          }
+        }
+        ctx.restore();
+      }
+    }
 
     // ── startup: handle email confirmation callback ───────────
     async function handleHashTokens() {
